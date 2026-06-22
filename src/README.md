@@ -6,7 +6,7 @@ In questa sezione puoi consultare il codice sorgente incorporato nelle varie ver
 
 ## Versioni disponibili
 
-* [Versione 1.0](1.0/)
+* [Versione 1.0](v1.0/)
 
 ---
 
