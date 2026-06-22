@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>miniOS</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Segoe UI",sans-serif;
+user-select:none;
+}
+
+:root{
+--accent:#7cff6b;
+--window:rgba(255,255,255,.12);
+--taskbar:rgba(0,0,0,.35);
+--text:white;
+--blur:blur(20px);
+}
+
+body{
+overflow:hidden;
+height:100vh;
+background:#111;
+color:var(--text);
+}
+
+.light{
+--window:rgba(255,255,255,.7);
+--taskbar:rgba(255,255,255,.6);
+--text:#111;
+}
+
+#desktop{
+position:fixed;
+inset:0;
+background:linear-gradient(135deg,#4caf50,#ffee58);
+display:none;
+overflow:hidden;
+}
+
+#boot{
+position:fixed;
+inset:0;
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:999999;
+color:white;
+}
+
+#boot h1{
+font-size:70px;
+text-shadow:0 0 20px var(--accent);
+}
+
+.loader{
+width:70px;
+height:70px;
+border-radius:50%;
+border:5px solid rgba(255,255,255,.2);
+border-top:5px solid var(--accent);
+animation:spin 1s linear infinite;
+margin:20px;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg);}
+}
+
+#lockscreen{
+position:fixed;
+inset:0;
+background:linear-gradient(135deg,#4caf50,#ffee58);
+display:none;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+backdrop-filter:blur(20px);
+z-index:99999;
+color:white;
+}
+
+#lockscreen h1{
+font-size:90px;
+}
+
+.taskbar{
+position:absolute;
+bottom:0;
+left:0;
+right:0;
+height:50px;
+background:var(--taskbar);
+backdrop-filter:blur(20px);
+display:flex;
+align-items:center;
+padding:0 10px;
+}
+
+.start-btn{
+width:40px;
+height:40px;
+border-radius:12px;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+background:rgba(255,255,255,.1);
+transition:.2s;
+}
+
+.start-btn:hover{
+background:rgba(255,255,255,.2);
+}
+
+#clock{
+margin-left:auto;
+padding:10px;
+}
+
+#startMenu{
+position:absolute;
+bottom:60px;
+left:10px;
+width:300px;
+height:420px;
+background:rgba(20,20,20,.5);
+backdrop-filter:blur(30px);
+border-radius:20px;
+display:none;
+padding:15px;
+overflow:auto;
+box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+
+.app{
+padding:12px;
+margin-bottom:10px;
+border-radius:12px;
+cursor:pointer;
+background:rgba(255,255,255,.08);
+transition:.2s;
+}
+
+.app:hover{
+background:rgba(255,255,255,.15);
+}
+
+.desktop-icons{
+padding:20px;
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+
+.icon{
+width:90px;
+text-align:center;
+cursor:pointer;
+color:white;
+}
+
+.icon img{
+width:64px;
+height:64px;
+}
+
+.window{
+position:absolute;
+width:700px;
+height:450px;
+background:var(--window);
+backdrop-filter:blur(20px);
+border-radius:16px;
+overflow:hidden;
+resize:both;
+box-shadow:0 10px 40px rgba(0,0,0,.5);
+animation:openWin .2s;
+}
+
+@keyframes openWin{
+from{
+transform:scale(.8);
+opacity:0;
+}
+to{
+transform:scale(1);
+opacity:1;
+}
+}
+
+.titlebar{
+height:40px;
+display:flex;
+align-items:center;
+padding:0 10px;
+background:rgba(255,255,255,.08);
+cursor:move;
+}
+
+.window-buttons{
+margin-left:auto;
+display:flex;
+gap:10px;
+}
+
+.win-btn{
+width:18px;
+height:18px;
+border-radius:50%;
+cursor:pointer;
+}
+
+.close{background:#ff5f57;}
+.min{background:#febc2e;}
+.max{background:#28c840;}
+
+.content{
+height:calc(100% - 40px);
+overflow:auto;
+padding:15px;
+}
+
+.sidebar{
+width:180px;
+height:100%;
+float:left;
+padding:10px;
+background:rgba(0,0,0,.2);
+}
+
+.settings-main{
+margin-left:190px;
+padding:10px;
+}
+
+.switch{
+width:60px;
+height:28px;
+background:#555;
+border-radius:20px;
+position:relative;
+cursor:pointer;
+transition:.3s;
+}
+
+.switch::after{
+content:"";
+position:absolute;
+width:24px;
+height:24px;
+background:white;
+border-radius:50%;
+top:2px;
+left:2px;
+transition:.3s;
+}
+
+.switch.active{
+background:var(--accent);
+}
+
+.switch.active::after{
+left:34px;
+}
+
+input,button,select,textarea{
+padding:10px;
+border:none;
+outline:none;
+border-radius:10px;
+margin:5px 0;
+}
+
+button{
+background:var(--accent);
+cursor:pointer;
+}
+
+.terminal{
+background:black;
+color:#0f0;
+height:100%;
+font-family:monospace;
+padding:10px;
+overflow:auto;
+}
+
+.term-input{
+background:transparent;
+border:none;
+color:#0f0;
+font-family:monospace;
+width:90%;
+}
+
+.oobe{
+position:fixed;
+inset:0;
+display:none;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#111,#333);
+z-index:999999;
+}
+
+.oobe-box{
+width:500px;
+padding:40px;
+background:rgba(255,255,255,.1);
+backdrop-filter:blur(20px);
+border-radius:20px;
+color:white;
+}
+
+.file{
+padding:10px;
+margin:5px 0;
+border-radius:10px;
+background:rgba(255,255,255,.1);
+cursor:pointer;
+}
+
+canvas{
+background:black;
+display:block;
+margin:auto;
+}
+
+</style>
+</head>
+<body>
+
+<div id="boot">
+<h1>miniOS</h1>
+<div class="loader"></div>
+<p>Loading miniOS...</p>
+</div>
+
+<div id="lockscreen">
+<h1 id="lockTime"></h1>
+<p id="lockDate"></p>
+</div>
+
+<div class="oobe" id="oobe">
+<div class="oobe-box">
+
+<h1>Configurazione miniOS</h1>
+
+<input id="username" placeholder="Nome Utente">
+<input id="pcname" placeholder="Nome PC">
+
+<select id="theme">
+<option value="dark">Tema Scuro</option>
+<option value="light">Tema Chiaro</option>
+</select>
+
+<input id="color" type="color" value="#7cff6b">
+
+<button onclick="finishSetup()">
+Completa
+</button>
+
+</div>
+</div>
+
+<div id="desktop">
+
+<div class="desktop-icons">
+
+<div class="icon" onclick="openApp('settings')">
+<img src="https://cdn-icons-png.flaticon.com/512/3524/3524659.png">
+<div>Impostazioni</div>
+</div>
+
+<div class="icon" onclick="openApp('explorer')">
+<img src="https://cdn-icons-png.flaticon.com/512/716/716784.png">
+<div>Explorer</div>
+</div>
+
+<div class="icon" onclick="openApp('terminal')">
+<img src="https://cdn-icons-png.flaticon.com/512/4248/4248443.png">
+<div>Terminale</div>
+</div>
+
+<div class="icon" onclick="openApp('games')">
+<img src="https://cdn-icons-png.flaticon.com/512/686/686589.png">
+<div>Giochi</div>
+</div>
+
+<div class="icon" onclick="openApp('python')">
+<img src="https://cdn-icons-png.flaticon.com/512/5968/5968350.png">
+<div>Python</div>
+</div>
+
+</div>
+
+<div id="startMenu"></div>
+
+<div class="taskbar">
+<div class="start-btn" onclick="toggleStart()">⊞</div>
+<div id="clock"></div>
+</div>
+
+</div>
+
+<script>
+
+let z=10;
+
+const filesystem={
+System:{
+"boot.js":"boot"
+},
+Users:{},
+Drivers:{
+"GPU.driver":"gpu"
+},
+Apps:{}
+};
+
+const apps={
+
+settings:{
+title:"Impostazioni",
+content:`
+
+<div style="display:flex;height:100%;">
+
+<div class="sidebar">
+
+<div class="app" onclick="openSettingsPage('personalization')">
+🎨 Personalizzazione
+</div>
+
+<div class="app" onclick="openSettingsPage('security')">
+🛡 Sicurezza
+</div>
+
+<div class="app" onclick="openSettingsPage('update')">
+🔄 Aggiornamento
+</div>
+
+<div class="app" onclick="openSettingsPage('about')">
+💻 Informazioni
+</div>
+
+<div class="app" onclick="openSettingsPage('recovery')">
+♻ Ripristino
+</div>
+
+</div>
+
+<div class="settings-main" id="settingsPage">
+
+<h2>Benvenuto in Impostazioni</h2>
+<p>Seleziona una categoria.</p>
+
+</div>
+
+</div>
+
+`
+},
+
+explorer:{
+title:"Explorer",
+content:`<div id="files"></div>`
+},
+
+terminal:{
+title:"Terminale",
+content:`
+<div class="terminal">
+
+<div id="termOutput"></div>
+
+<div>
+<span id="prompt"></span>
+<input class="term-input" id="termInput">
+</div>
+
+</div>
+`
+},
+
+games:{
+title:"Giochi",
+content:`
+<div class="app" onclick="openSnake()">Snake</div>
+<div class="app" onclick="alert('Solitario simulato')">Solitario</div>
+`
+},
+
+python:{
+title:"Python",
+content:`
+<textarea id="pycode" style="width:100%;height:200px;">print("Ciao miniOS")</textarea>
+
+<button onclick="runPython()">
+Esegui
+</button>
+
+<pre id="pyout"></pre>
+`
+}
+
+};
+
+function toggleStart(){
+
+const menu=document.getElementById("startMenu");
+
+menu.style.display=
+menu.style.display==="block"
+? "none"
+: "block";
+
+menu.innerHTML="";
+
+for(let key in apps){
+
+menu.innerHTML+=`
+
+<div class="app" onclick="openApp('${key}')">
+
+${apps[key].title}
+
+</div>
+
+`;
+
+}
+
+}
+
+function openSettingsPage(page){
+
+const c=document.getElementById("settingsPage");
+
+if(page==="personalization"){
+
+c.innerHTML=`
+
+<h1>🎨 Personalizzazione</h1>
+
+<h3>Tema</h3>
+
+<select id="themeSelect">
+<option value="dark">Scuro</option>
+<option value="light">Chiaro</option>
+</select>
+
+<h3>Colore Accento</h3>
+
+<input type="color" id="accentPicker">
+
+<h3>Trasparenze Aero</h3>
+
+<div class="switch" id="aeroSwitch"></div>
+
+`;
+
+document.getElementById("themeSelect").value=
+localStorage.getItem("theme") || "dark";
+
+document.getElementById("accentPicker").value=
+localStorage.getItem("accent") || "#7cff6b";
+
+document.getElementById("themeSelect").onchange=(e)=>{
+
+localStorage.setItem("theme",e.target.value);
+
+applyTheme(e.target.value);
+
+};
+
+document.getElementById("accentPicker").oninput=(e)=>{
+
+localStorage.setItem("accent",e.target.value);
+
+applyAccent(e.target.value);
+
+};
+
+const aero=document.getElementById("aeroSwitch");
+
+if(localStorage.getItem("aero")==="true"){
+aero.classList.add("active");
+}
+
+aero.onclick=()=>{
+
+aero.classList.toggle("active");
+
+localStorage.setItem(
+"aero",
+aero.classList.contains("active")
+);
+
+document.querySelectorAll(".window").forEach(w=>{
+
+w.style.backdropFilter=
+aero.classList.contains("active")
+? "blur(20px)"
+: "none";
+
+});
+
+};
+
+}
+
+if(page==="security"){
+
+c.innerHTML=`
+
+<h1>🛡 Sicurezza</h1>
+
+<p>Defender miniOS attivo.</p>
+
+<div class="switch active"></div>
+
+`;
+
+}
+
+if(page==="update"){
+
+c.innerHTML=`
+
+<h1>🔄 Aggiornamento</h1>
+
+<button onclick="fakeUpdate()">
+
+Controlla Aggiornamenti
+
+</button>
+
+<div id="updateStatus"></div>
+
+`;
+
+}
+
+if(page==="about"){
+
+c.innerHTML=`
+
+<h1>💻 Sistema</h1>
+
+<p>Utente: ${localStorage.getItem("username")}</p>
+
+<p>PC: ${localStorage.getItem("pcname")}</p>
+
+<p>miniOS 1.0 - Build 1000</p>
+
+`;
+
+}
+
+if(page==="recovery"){
+
+c.innerHTML=`
+
+<h1>♻ Ripristino</h1>
+
+<button onclick="factoryReset()">
+
+Resetta miniOS
+
+</button>
+
+`;
+
+}
+
+}
+
+function openApp(name){
+
+const app=apps[name];
+
+const win=document.createElement("div");
+
+win.className="window";
+
+win.style.left=Math.random()*300+100+"px";
+win.style.top=Math.random()*100+50+"px";
+
+win.style.zIndex=++z;
+
+win.innerHTML=`
+
+<div class="titlebar">
+
+<span>${app.title}</span>
+
+<div class="window-buttons">
+
+<div class="win-btn min"></div>
+<div class="win-btn max"></div>
+<div class="win-btn close"></div>
+
+</div>
+
+</div>
+
+<div class="content">
+
+${app.content}
+
+</div>
+
+`;
+
+document.getElementById("desktop").appendChild(win);
+
+makeDraggable(win);
+
+win.querySelector(".close").onclick=()=>win.remove();
+
+win.querySelector(".min").onclick=()=>{
+win.style.display="none";
+};
+
+win.querySelector(".max").onclick=()=>{
+
+if(win.classList.contains("maxed")){
+
+win.style.width="700px";
+win.style.height="450px";
+
+win.classList.remove("maxed");
+
+}else{
+
+win.style.left="0";
+win.style.top="0";
+win.style.width="100%";
+win.style.height="calc(100% - 50px)";
+
+win.classList.add("maxed");
+
+}
+
+};
+
+if(name==="terminal") initTerminal();
+if(name==="explorer") renderFiles();
+
+}
+
+function makeDraggable(el){
+
+const bar=el.querySelector(".titlebar");
+
+let x=0,y=0,dx=0,dy=0;
+
+bar.onmousedown=dragMouseDown;
+
+function dragMouseDown(e){
+
+e.preventDefault();
+
+dx=e.clientX;
+dy=e.clientY;
+
+document.onmouseup=closeDrag;
+document.onmousemove=drag;
+
+}
+
+function drag(e){
+
+e.preventDefault();
+
+x=dx-e.clientX;
+y=dy-e.clientY;
+
+dx=e.clientX;
+dy=e.clientY;
+
+el.style.top=(el.offsetTop-y)+"px";
+el.style.left=(el.offsetLeft-x)+"px";
+
+}
+
+function closeDrag(){
+
+document.onmouseup=null;
+document.onmousemove=null;
+
+}
+
+}
+
+function renderFiles(){
+
+const el=document.getElementById("files");
+
+el.innerHTML="";
+
+for(let key in filesystem){
+
+el.innerHTML+=`
+<div class="file">📁 ${key}</div>
+`;
+
+}
+
+}
+
+function initTerminal(){
+
+const input=document.getElementById("termInput");
+const output=document.getElementById("termOutput");
+const prompt=document.getElementById("prompt");
+
+let current="/";
+
+prompt.innerText=
+`${localStorage.getItem("username")}@miniOS:${current} $ `;
+
+input.focus();
+
+input.addEventListener("keydown",e=>{
+
+if(e.key==="Enter"){
+
+const cmd=input.value;
+
+output.innerHTML+=`
+<div>${prompt.innerText}${cmd}</div>
+`;
+
+parseCommand(cmd);
+
+input.value="";
+
+}
+
+});
+
+function parseCommand(cmd){
+
+const args=cmd.split(" ");
+
+switch(args[0]){
+
+case "help":
+output.innerHTML+="help ls clear date echo whoami pwd<br>";
+break;
+
+case "clear":
+output.innerHTML="";
+break;
+
+case "date":
+output.innerHTML+=new Date()+"<br>";
+break;
+
+case "echo":
+output.innerHTML+=args.slice(1).join(" ")+"<br>";
+break;
+
+case "whoami":
+output.innerHTML+=localStorage.getItem("username")+"<br>";
+break;
+
+case "pwd":
+output.innerHTML+=current+"<br>";
+break;
+
+case "ls":
+output.innerHTML+=Object.keys(filesystem).join(" ")+"<br>";
+break;
+
+default:
+output.innerHTML+="Comando sconosciuto<br>";
+
+}
+
+}
+
+}
+
+function runPython(){
+
+const code=document.getElementById("pycode").value;
+
+const out=document.getElementById("pyout");
+
+try{
+
+let result="";
+
+const print=(txt)=>{
+result+=txt+"\n";
+};
+
+eval(code);
+
+out.innerText=result;
+
+}catch(e){
+
+out.innerText=e;
+
+}
+
+}
+
+function openSnake(){
+
+const win=document.createElement("div");
+
+win.className="window";
+
+win.style.width="420px";
+win.style.height="500px";
+
+win.innerHTML=`
+
+<div class="titlebar">
+
+<span>Snake</span>
+
+<div class="window-buttons">
+
+<div class="win-btn close"></div>
+
+</div>
+
+</div>
+
+<div class="content">
+
+<canvas id="snake" width="380" height="380"></canvas>
+
+</div>
+
+`;
+
+document.getElementById("desktop").appendChild(win);
+
+win.querySelector(".close").onclick=()=>win.remove();
+
+const canvas=win.querySelector("#snake");
+const ctx=canvas.getContext("2d");
+
+let snake=[{x:10,y:10}];
+let food={x:15,y:15};
+
+let dx=1;
+let dy=0;
+
+document.addEventListener("keydown",e=>{
+
+if(e.key==="ArrowUp"){dx=0;dy=-1}
+if(e.key==="ArrowDown"){dx=0;dy=1}
+if(e.key==="ArrowLeft"){dx=-1;dy=0}
+if(e.key==="ArrowRight"){dx=1;dy=0}
+
+});
+
+setInterval(()=>{
+
+ctx.fillStyle="black";
+ctx.fillRect(0,0,380,380);
+
+ctx.fillStyle="lime";
+
+snake.unshift({
+x:snake[0].x+dx,
+y:snake[0].y+dy
+});
+
+if(snake[0].x===food.x &&
+snake[0].y===food.y){
+
+food={
+x:Math.floor(Math.random()*19),
+y:Math.floor(Math.random()*19)
+};
+
+}else{
+
+snake.pop();
+
+}
+
+snake.forEach(s=>{
+
+ctx.fillRect(
+s.x*20,
+s.y*20,
+18,
+18
+);
+
+});
+
+ctx.fillStyle="red";
+
+ctx.fillRect(
+food.x*20,
+food.y*20,
+18,
+18
+);
+
+},120);
+
+}
+
+function applyTheme(theme){
+
+if(theme==="light"){
+
+document.body.classList.add("light");
+
+}else{
+
+document.body.classList.remove("light");
+
+}
+
+}
+
+function applyAccent(color){
+
+document.documentElement.style
+.setProperty("--accent",color);
+
+}
+
+function fakeUpdate(){
+
+updateStatus.innerHTML="✅ miniOS aggiornato.";
+
+
+}
+
+function factoryReset(){
+
+if(confirm("Resettare miniOS?")){
+
+localStorage.clear();
+
+location.reload();
+
+}
+
+}
+
+function finishSetup(){
+
+localStorage.setItem(
+"setup",
+"done"
+);
+
+localStorage.setItem(
+"username",
+document.getElementById("username").value
+);
+
+localStorage.setItem(
+"pcname",
+document.getElementById("pcname").value
+);
+
+localStorage.setItem(
+"theme",
+document.getElementById("theme").value
+);
+
+localStorage.setItem(
+"accent",
+document.getElementById("color").value
+);
+
+document.getElementById("oobe").style.display="none";
+
+applyTheme(
+localStorage.getItem("theme")
+);
+
+applyAccent(
+localStorage.getItem("accent")
+);
+
+showDesktop();
+
+}
+
+function showDesktop(){
+
+document.getElementById("desktop")
+.style.display="block";
+
+}
+
+setInterval(()=>{
+
+const d=new Date();
+
+document.getElementById("clock")
+.innerText=d.toLocaleTimeString();
+
+document.getElementById("lockTime")
+.innerText=d.toLocaleTimeString();
+
+document.getElementById("lockDate")
+.innerText=d.toLocaleDateString();
+
+},1000);
+
+setTimeout(()=>{
+
+document.getElementById("boot")
+.style.display="none";
+
+document.getElementById("lockscreen")
+.style.display="flex";
+
+},2500);
+
+document.getElementById("lockscreen").onclick=()=>{
+
+document.getElementById("lockscreen")
+.style.display="none";
+
+if(localStorage.getItem("setup")!=="done"){
+
+document.getElementById("oobe")
+.style.display="flex";
+
+}else{
+
+applyTheme(
+localStorage.getItem("theme")
+);
+
+applyAccent(
+localStorage.getItem("accent")
+);
+
+showDesktop();
+
+}
+
+};
+
+</script>
+</body>
+</html>

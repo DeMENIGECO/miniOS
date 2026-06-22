@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>miniOS – Download</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #05060a;
+      --bg-alt: #0b0d14;
+      --accent: #4f8cff;
+      --accent-2: #ff4f9a;
+      --text: #f5f7ff;
+      --muted: #9aa0c2;
+      --border: #1a1d2b;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.65);
+      --font-main: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #151a33 0, #05060a 52%, #020308 100%);
+      color: var(--text);
+      font-family: var(--font-main);
+      margin: 0;
+      padding: 0;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* NAVBAR (identica alla homepage) */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: conic-gradient(
+        from 210deg,
+        #4f8cff,
+        #7b5cff,
+        #ff4f9a,
+        #ffc94f,
+        #4f8cff
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 14px 40px rgba(0, 0, 0, 0.7);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-logo span {
+      position: relative;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #05060a;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-name {
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 13px;
+      color: #f5f7ff;
+    }
+
+    .brand-tagline {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 13px;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 0;
+      position: relative;
+      transition: color 0.18s ease-out;
+    }
+
+    nav a:hover {
+      color: var(--text);
+    }
+
+    .nav-cta {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(135deg, #15182a, #0b0d18);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.18s ease-out;
+      text-decoration: none;
+    }
+
+    .nav-cta:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      color: var(--text);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    /* PAGE CONTENT */
+    h1 {
+      font-size: 2.6rem;
+      margin-bottom: 10px;
+      background: linear-gradient(120deg, #ffffff, #c7d4ff, #7fa2ff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 40px;
+    }
+
+    .main-download {
+      background: linear-gradient(145deg, #070814, #05060d);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 40px;
+    }
+
+    .main-download h2 {
+      margin: 0 0 10px;
+      font-size: 1.4rem;
+    }
+
+    .main-download p {
+      margin: 0 0 20px;
+      color: var(--muted);
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 12px 26px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #4f8cff, #7b5cff, #ff4f9a);
+      color: #05060a;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 18px 50px rgba(79, 140, 255, 0.5);
+      transition: 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 60px rgba(79, 140, 255, 0.7);
+    }
+
+    .versions {
+      margin-top: 50px;
+    }
+
+    .versions h3 {
+      margin-bottom: 16px;
+      font-size: 1.3rem;
+    }
+
+    .version-card {
+      background: rgba(8, 10, 20, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 18px;
+      border-radius: var(--radius-md);
+      margin-bottom: 14px;
+    }
+
+    .version-title {
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+
+    .version-info {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    .version-links a {
+      display: inline-block;
+      margin-right: 12px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: 0.2s;
+    }
+
+    .version-links a:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    footer {
+      margin-top: 60px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(255, 255, 255, 0.25);
+    }
+
+    footer a:hover {
+      color: var(--text);
+      border-bottom-style: solid;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- NAVBAR -->
+    <header>
+      <div class="brand">
+        <div class="brand-logo"><span>m</span></div>
+        <div class="brand-text">
+          <div class="brand-name">miniOS</div>
+          <div class="brand-tagline">Mini sistema operativo in HTML</div>
+        </div>
+      </div>
+
+      <nav>
+        <a href="/miniOS/#features">Caratteristiche</a>
+        <a href="https://github.com/DeMENIGECO/miniOS" target="_blank">GitHub</a>
+        <a href="/miniOS/download" class="nav-cta"><span>⬇</span> Scarica</a>
+      </nav>
+    </header>
+
+    <!-- CONTENT -->
+    <h1>Download miniOS</h1>
+    <p class="subtitle">Scarica l’ultima versione stabile o prova il Webtest direttamente dal browser.</p>
+
+    <section class="main-download">
+      <h2>miniOS 1.0 Build 1000(Latest)</h2>
+      <p>Versione stabile consigliata per tutti gli utenti. Include tutte le funzionalità principali.</p>
+      <a class="btn-primary" href="/miniOS/src/v1.0/build-1000/minios_1.0_1000.zip" target="_blank">
+        ⬇ Scarica miniOS 1.0
+      </a>
+    </section>
+
+    <section class="versions">
+      <h3>Altre versioni</h3>
+
+      <h4>1.0</h4>
+
+      <div class="version-card">
+        <div class="version-title">miniOS 1.0 Build 1000</div>
+        <div class="version-info">Prima versione stabile.</div>
+        <div class="version-links">
+          <a href="https://github.com/DeMENIGECO/miniOS/tree/main/src/v1.0/build-1000" target="_blank">GitHub</a>
+          <a href="/miniOS/webtest/" target="_blank">Webtest</a>
+          <a href="/miniOS/src/v1.0/build-1000/">Codice sorgente incorporato</a>
+        </div>
+      </div>
+
+    <footer>
+      Creato con ❤️ da <a href="https://github.com/DeMENIGECO" target="_blank">DomeniGeco</a> •
+      Codice su <a href="https://github.com/DeMENIGECO/miniOS" target="_blank">GitHub</a>
+    </footer>
+
+  </div>
+</body>
+</html>
