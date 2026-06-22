@@ -51,7 +51,7 @@ https://demenigeco.github.io/miniOS/webtest/
 
 ### 💾 Scarica la versione stabile
 Scarica il file HTML:  
-https://demenigeco.github.io/miniOS/#download
+https://demenigeco.github.io/miniOS/download
 
 Aprilo con qualsiasi browser (Chrome, Edge, Firefox…).
 
